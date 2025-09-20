@@ -111,3 +111,17 @@ class UserChatDataResponse(BaseModel):
     user_data: UserChatData = Field(description="Complete user chat data")
     success: bool = Field(default=True, description="Operation success status")
     message: Optional[str] = Field(default=None, description="Response message")
+
+
+class DeleteThreadResponse(BaseModel):
+    """Response model for thread deletion."""
+    success: bool = Field(description="Operation success status")
+    message: str = Field(description="Response message")
+    thread_id: str = Field(description="Deleted thread ID")
+
+
+class UserLimitsResponse(BaseModel):
+    """Response model for user request limits."""
+    requests_available: int = Field(description="Number of requests remaining")
+    max_requests: int = Field(description="Maximum requests allowed")
+    requests_used: int = Field(description="Number of requests used")

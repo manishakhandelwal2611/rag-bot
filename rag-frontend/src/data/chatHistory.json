@@ -1,0 +1,68 @@
+{
+  "chats": [
+    {
+      "id": "1",
+      "title": "What is RAG?",
+      "lastMessage": "RAG stands for Retrieval-Augmented Generation, a technique that combines the power of large language models with external knowledge retrieval to provide more accurate and up-to-date responses.",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "isActive": true,
+      "messageCount": 12
+    },
+    {
+      "id": "2",
+      "title": "Machine Learning Basics",
+      "lastMessage": "Machine learning is a subset of artificial intelligence that focuses on algorithms that can learn and make decisions from data without being explicitly programmed.",
+      "timestamp": "2024-01-15T08:15:00Z",
+      "isActive": false,
+      "messageCount": 8
+    },
+    {
+      "id": "3",
+      "title": "Neural Networks Explained",
+      "lastMessage": "Neural networks are computing systems inspired by biological neural networks. They consist of interconnected nodes (neurons) that process information using a connectionist approach.",
+      "timestamp": "2024-01-14T16:45:00Z",
+      "isActive": false,
+      "messageCount": 15
+    },
+    {
+      "id": "4",
+      "title": "AI Ethics Discussion",
+      "lastMessage": "Ethical considerations in AI development are crucial for ensuring responsible deployment. This includes fairness, transparency, privacy, and accountability.",
+      "timestamp": "2024-01-13T14:20:00Z",
+      "isActive": false,
+      "messageCount": 6
+    },
+    {
+      "id": "5",
+      "title": "Natural Language Processing",
+      "lastMessage": "NLP is a field of AI that focuses on the interaction between computers and humans through natural language. It involves processing and analyzing large amounts of natural language data.",
+      "timestamp": "2024-01-12T11:10:00Z",
+      "isActive": false,
+      "messageCount": 9
+    },
+    {
+      "id": "6",
+      "title": "Deep Learning Fundamentals",
+      "lastMessage": "Deep learning is a subset of machine learning that uses neural networks with multiple layers to model and understand complex patterns in data.",
+      "timestamp": "2024-01-11T09:30:00Z",
+      "isActive": false,
+      "messageCount": 11
+    },
+    {
+      "id": "7",
+      "title": "Computer Vision Applications",
+      "lastMessage": "Computer vision enables machines to interpret and understand visual information from the world, with applications in image recognition, object detection, and medical imaging.",
+      "timestamp": "2024-01-10T15:45:00Z",
+      "isActive": false,
+      "messageCount": 7
+    },
+    {
+      "id": "8",
+      "title": "Reinforcement Learning",
+      "lastMessage": "Reinforcement learning is a type of machine learning where an agent learns to make decisions by taking actions in an environment to maximize cumulative reward.",
+      "timestamp": "2024-01-09T13:20:00Z",
+      "isActive": false,
+      "messageCount": 5
+    }
+  ]
+}

@@ -213,6 +213,36 @@ class ChatHandler:
         
         logger.info(f"Retrieved {len(chat_messages)} messages from thread {thread_id} for user {user_email}")
         return response
+    
+    @staticmethod
+    def delete_thread(thread_id: str, user_email: str) -> Dict[str, Any]:
+        """
+        Delete a specific thread.
+        
+        Args:
+            thread_id: Thread ID
+            user_email: User email
+        
+        Returns:
+            Dict with success status and message
+        
+        Raises:
+            ValueError: If thread not found
+        """
+        # Delete thread
+        deleted = chat_service.delete_thread(thread_id, user_email)
+        
+        if not deleted:
+            raise ValueError("Thread not found")
+        
+        response = {
+            "success": True,
+            "message": "Thread deleted successfully",
+            "thread_id": thread_id
+        }
+        
+        logger.info(f"Deleted thread {thread_id} for user {user_email}")
+        return response
 
 
 # Global instance

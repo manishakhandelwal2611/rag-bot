@@ -1,0 +1,6 @@
+export { default as ChatHeader } from './ChatHeader'
+export { default as WelcomeMessage } from './WelcomeMessage'
+export { default as TypingIndicator } from './TypingIndicator'
+export { default as MessageBubble } from './MessageBubble'
+export { default as MessageInput } from './MessageInput'
+export { default as MessagesList } from './MessagesList'

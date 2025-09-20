@@ -40,13 +40,13 @@ def query_endpoint(request: QueryRequest, current_user: dict = Depends(require_a
         logger.warning(f"Question too long: {len(question)} characters")
         raise HTTPException(status_code=400, detail="Question too long (max 1000 characters)")
 
-    # Check assistant message limit before processing
-    if not chat_service.can_user_send_message(user_email, settings.MAX_MESSAGES_PER_USER):
-        current_count = chat_service.get_user_message_count(user_email)
-        logger.warning(f"User {user_email} has reached assistant message limit: {current_count}/{settings.MAX_MESSAGES_PER_USER}")
+    # Check if user has requests available
+    if not chat_service.can_user_send_message(user_email):
+        requests_available = chat_service.get_user_requests_available(user_email)
+        logger.warning(f"User {user_email} has no requests available: {requests_available}/{settings.MAX_MESSAGES_PER_USER}")
         raise HTTPException(
             status_code=429, 
-            detail=f"Assistant response limit reached. You have used {current_count}/{settings.MAX_MESSAGES_PER_USER} assistant responses. Please contact support to increase your limit."
+            detail=f"Request limit exceeded. You have {requests_available} requests remaining out of {settings.MAX_MESSAGES_PER_USER}. Please contact support to increase your limit."
         )
 
     # Handle thread management
@@ -86,6 +86,10 @@ def query_endpoint(request: QueryRequest, current_user: dict = Depends(require_a
     except ValueError as e:
         logger.error(f"Failed to add assistant response to thread: {e}")
         # Don't fail the request, just log the error
+
+    # Decrement user's available requests
+    remaining_requests = chat_service.decrement_user_requests(user_email)
+    logger.info(f"User {user_email} has {remaining_requests} requests remaining")
 
     logger.info(f"Query processed successfully, response length: {len(answer)}, thread: {thread_id}")
     return QueryResponse(answer=answer, thread_id=thread_id)

@@ -38,13 +38,23 @@ class ChatService:
         user_data = self.redis_client.get(user_key)
         
         if not user_data:
-            return {"threads": []}
+            return {
+                "threads": [],
+                "requests_available": settings.MAX_MESSAGES_PER_USER
+            }
         
         try:
-            return json.loads(user_data)
+            data = json.loads(user_data)
+            # Ensure requests_available field exists for existing users
+            if "requests_available" not in data:
+                data["requests_available"] = settings.MAX_MESSAGES_PER_USER
+            return data
         except json.JSONDecodeError as e:
             logger.error(f"Error parsing user data for {user_email}: {e}")
-            return {"threads": []}
+            return {
+                "threads": [],
+                "requests_available": settings.MAX_MESSAGES_PER_USER
+            }
     
     def _save_user_data(self, user_email: str, user_data: Dict[str, Any]) -> None:
         """Save user's chat data to Redis."""
@@ -126,23 +136,46 @@ class ChatService:
         user_data = self._get_user_data(user_email)
         return user_data["threads"]
     
-    def get_user_message_count(self, user_email: str) -> int:
-        """Get assistant message count for a user across all threads."""
+    def get_user_requests_available(self, user_email: str) -> int:
+        """Get remaining requests available for a user."""
         user_data = self._get_user_data(user_email)
-        assistant_messages = 0
-        
-        for thread in user_data["threads"]:
-            messages = thread.get("messages", [])
-            for message in messages:
-                if message.get("role") == "assistant":
-                    assistant_messages += 1
-        
-        return assistant_messages
+        return user_data.get("requests_available", settings.MAX_MESSAGES_PER_USER)
     
-    def can_user_send_message(self, user_email: str, max_messages: int) -> bool:
-        """Check if user can send another message based on limit."""
-        current_count = self.get_user_message_count(user_email)
-        return current_count < max_messages
+    def can_user_send_message(self, user_email: str) -> bool:
+        """Check if user can send another message based on remaining requests."""
+        requests_available = self.get_user_requests_available(user_email)
+        return requests_available > 0
+    
+    def decrement_user_requests(self, user_email: str) -> int:
+        """Decrement user's available requests and return remaining count."""
+        user_data = self._get_user_data(user_email)
+        current_requests = user_data.get("requests_available", settings.MAX_MESSAGES_PER_USER)
+        
+        if current_requests > 0:
+            user_data["requests_available"] = current_requests - 1
+            self._save_user_data(user_email, user_data)
+            logger.info(f"Decremented requests for {user_email}. Remaining: {user_data['requests_available']}")
+        
+        return user_data["requests_available"]
+    
+    def delete_thread(self, thread_id: str, user_email: str) -> bool:
+        """Delete a thread for a user."""
+        # Get user's data
+        user_data = self._get_user_data(user_email)
+        
+        # Find and remove the thread
+        original_count = len(user_data["threads"])
+        user_data["threads"] = [thread for thread in user_data["threads"] if thread["id"] != thread_id]
+        
+        # Check if thread was found and removed
+        if len(user_data["threads"]) == original_count:
+            return False  # Thread not found
+        
+        # Save back to Redis
+        self._save_user_data(user_email, user_data)
+        
+        logger.info(f"Deleted thread {thread_id} for user {user_email}")
+        return True
     
     def health_check(self) -> bool:
         """Check if Redis connection is healthy."""

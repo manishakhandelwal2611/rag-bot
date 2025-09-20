@@ -7,7 +7,9 @@ from app.core.auth import require_auth
 from app.models.chat import (
     ThreadListResponse, 
     ThreadResponse,
-    MessageListResponse
+    MessageListResponse,
+    DeleteThreadResponse,
+    UserLimitsResponse
 )
 from app.handlers.chat_handler import chat_handler
 from app.utils.logger import get_common_logger, log_api_endpoint
@@ -114,5 +116,65 @@ async def get_thread_messages(
     except Exception as e:
         logger.error(f"Error retrieving messages from thread {thread_id} for user {current_user.get('email', 'unknown')}: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve messages")
+
+
+@router.delete("/threads/{thread_id}", response_model=DeleteThreadResponse)
+@log_api_endpoint(log_request=True, log_response=True, log_performance=True)
+async def delete_thread(
+    thread_id: str,
+    current_user: dict = Depends(require_auth)
+):
+    """
+    Delete a specific thread.
+    
+    Args:
+        thread_id: Thread ID to delete
+        current_user: Authenticated user information from JWT token
+    
+    Returns:
+        DeleteThreadResponse: Deletion confirmation
+    """
+    try:
+        user_email = current_user.get('email', 'unknown')
+        result = chat_handler.delete_thread(thread_id, user_email)
+        return DeleteThreadResponse(**result)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error deleting thread {thread_id} for user {current_user.get('email', 'unknown')}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete thread")
+
+
+@router.get("/limits", response_model=UserLimitsResponse)
+@log_api_endpoint(log_request=True, log_response=True, log_performance=True)
+async def get_user_limits(
+    current_user: dict = Depends(require_auth)
+):
+    """
+    Get user's request limits and usage.
+    
+    Args:
+        current_user: Authenticated user information from JWT token
+    
+    Returns:
+        UserLimitsResponse: User's request limits and usage
+    """
+    try:
+        user_email = current_user.get('email', 'unknown')
+        from app.services.chat_service import chat_service
+        from app.core.config import settings
+        
+        requests_available = chat_service.get_user_requests_available(user_email)
+        max_requests = settings.MAX_MESSAGES_PER_USER
+        requests_used = max_requests - requests_available
+        
+        return UserLimitsResponse(
+            requests_available=requests_available,
+            max_requests=max_requests,
+            requests_used=requests_used
+        )
+    except Exception as e:
+        logger.error(f"Error retrieving limits for user {current_user.get('email', 'unknown')}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve user limits")
 
 
