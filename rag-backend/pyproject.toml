@@ -1,0 +1,50 @@
+[tool.poetry]
+name = "rag-backend"
+version = "0.1.0"
+description = "Enterprise-grade FastAPI + LangChain + LLaMA Index backend"
+authors = ["Manisha Khandelwal"]
+readme = "README.md"
+packages = [
+    { include = "app" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+
+# --- Web framework ---
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.30.6" }
+python-multipart = "^0.0.12"
+
+# --- Data validation & config ---
+pydantic = "^2.9.2"
+pydantic-settings = "^2.5.2"
+
+# --- RAG / AI stack ---
+langchain = "^0.3.3"
+langchain_pinecone = "^0.2.12"
+tiktoken = "^0.8.0"           # tokenizer support
+transformers = "^4.45.2"      # model integration
+sentence-transformers = "^3.0.1"
+
+# --- Utilities ---
+requests = "^2.32.3"
+llama-cpp-python = "^0.3.16"
+pinecone = "^7.3.0"
+langchain-community = "^0.3.29"
+llama-index = "^0.14.2"
+llama-index-embeddings-huggingface = "^0.6.1"
+llama-index-embeddings-langchain = "^0.4.1"
+llama-index-vector-stores-pinecone = "^0.7.1"
+llama-index-llms-llama-cpp = "^0.5.1"
+openai = "^1.108.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+mypy = "^1.11.1"
+pytest = "^8.3.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
